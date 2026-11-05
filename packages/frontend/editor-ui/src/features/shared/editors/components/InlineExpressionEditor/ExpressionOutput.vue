@@ -114,12 +114,11 @@ function initializeEditor() {
 				EditorState.readOnly.of(true),
 				EditorView.lineWrapping,
 				EditorView.domEventHandlers({ scroll: (_, view) => forceParse(view) }),
-				// Register the highlight field up front. A field appended in the same transaction
-					// as its first colour effects does not receive those effects, so highlights
-					// could be lost when the output mounts after the segments have resolved.
-					coloringStateField,
-					resolvablesTheme,
-					...props.extensions,
+				// Register the highlight field and theme with the editor, so the initial highlights
+				// do not depend on the field being appended in the same transaction as the colours.
+				coloringStateField,
+				resolvablesTheme,
+				...props.extensions,
 			],
 		}),
 	});
