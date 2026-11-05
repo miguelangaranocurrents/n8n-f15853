@@ -22,7 +22,7 @@ const cssClasses = {
 	plaintext: 'cm-plaintext',
 };
 
-const resolvablesTheme = EditorView.theme({
+export const resolvablesTheme = EditorView.theme({
 	['.' + cssClasses.validResolvable]: {
 		color: 'var(--expression-editor--resolvable--color--foreground--valid)',
 		backgroundColor: 'var(--expression-editor--resolvable--color--background--valid)',
