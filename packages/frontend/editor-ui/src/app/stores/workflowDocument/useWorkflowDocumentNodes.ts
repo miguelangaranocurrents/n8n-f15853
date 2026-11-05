@@ -574,6 +574,12 @@ export function useWorkflowDocumentNodes(deps: WorkflowDocumentNodesDeps) {
 		invalid: INodeCredentialsDetails;
 		type: string;
 	}) {
+		let replaced = false;
+		const replaceCredential = (node: INodeUi) => {
+			(node.credentials as INodeCredentials)[data.type] = data.credentials;
+			replaced = true;
+		};
+
 		nodes.value.forEach((node: INodeUi) => {
 			const nodeCredentials: INodeCredentials | undefined = (node as unknown as INode).credentials;
 			if (!nodeCredentials?.[data.type]) {
@@ -586,21 +592,28 @@ export function useWorkflowDocumentNodes(deps: WorkflowDocumentNodesDeps) {
 				typeof nodeCredentialDetails === 'string' &&
 				nodeCredentialDetails === data.invalid.name
 			) {
-				(node.credentials as INodeCredentials)[data.type] = data.credentials;
+				replaceCredential(node);
 				return;
 			}
 
 			if (nodeCredentialDetails.id === null) {
 				if (nodeCredentialDetails.name === data.invalid.name) {
-					(node.credentials as INodeCredentials)[data.type] = data.credentials;
+					replaceCredential(node);
 				}
 				return;
 			}
 
 			if (nodeCredentialDetails.id === data.invalid.id) {
-				(node.credentials as INodeCredentials)[data.type] = data.credentials;
+				replaceCredential(node);
 			}
 		});
+
+		// The replacement is written in place, so the updateNodeProperties call that follows
+		// for the same node sees no change and would not mark the workflow dirty. Mark it
+		// here so the replacement gets saved.
+		if (replaced) {
+			void onStateDirty.trigger();
+		}
 	}
 
 	// Assign credential to all nodes that support it but don't have it set
