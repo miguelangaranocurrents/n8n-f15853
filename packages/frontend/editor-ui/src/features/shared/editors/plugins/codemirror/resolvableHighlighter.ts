@@ -116,7 +116,10 @@ export const coloringStateField = StateField.define<DecorationSet>({
 
 					const decoration = resolvableStateToDecoration[txEffect.value.state ?? 'pending'];
 
-					if (txEffect.value.from === 0 && txEffect.value.to === 0) continue;
+					// Empty ranges cannot carry a mark decoration (CodeMirror throws for them), and
+					// throwing here would abort the rest of this update. e.g. `{{ "" }}` resolves to
+					// an empty range, which must not stop the following segments from being marked.
+					if (txEffect.value.from === txEffect.value.to) continue;
 
 					colorings = colorings.update({
 						add: [decoration.range(txEffect.value.from, txEffect.value.to)],
